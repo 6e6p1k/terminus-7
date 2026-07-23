@@ -1,42 +1,35 @@
-# sv
+# TERMINUS·7
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Cyberpunk neural-core chat uplink. Built from the Claude Design schema as a **Next.js + React + Tailwind** app with **Vercel AI Gateway** streaming and **Neon Postgres** persistence.
 
-## Creating a project
+## Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Next.js 16 (App Router) + React 19 + TypeScript
+- Tailwind CSS 4
+- AI SDK (`streamText`) via Vercel AI Gateway
+- Neon Serverless Postgres + Drizzle ORM
+- PWA manifest + `/preview/ios` framed mobile showcase (`IOSDevice`)
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## Setup
 
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.16.5 create --template minimal --types ts --add tailwindcss="plugins:none" drizzle="database:postgresql+postgresql:neon" sveltekit-adapter="adapter:vercel" --no-install .
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
+npm install
+cp .env.example .env.local
+# set DATABASE_URL and AI_GATEWAY_API_KEY (or use Vercel OIDC)
+npm run db:push
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+## Scripts
 
-To create a production version of your app:
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Local dev server |
+| `npm run build` | Production build |
+| `npm run db:push` | Push Drizzle schema to Neon |
 
-```sh
-npm run build
-```
+## UI
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- Desktop: sidebar session log + top `CMD_INPUT` module + staggered feed
+- Mobile (`<900px`): PWA layout with session slide-over + bottom input dock
+- `/preview/ios`: design-schema phone frame preview

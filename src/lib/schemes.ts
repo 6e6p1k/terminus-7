@@ -1,0 +1,90 @@
+import type { CSSProperties } from 'react';
+import type { ColorScheme, SchemeColors } from './types';
+
+export const SCHEME_MAP: Record<ColorScheme, SchemeColors> = {
+	'CYAN / MAGENTA': {
+		cyan: '#22e6ff',
+		mag: '#ff37c7',
+		text: '#d7fbff',
+		cyanGlow: '34,230,255',
+		magGlow: '255,55,199',
+		bg: '#07070c',
+		panel: '#0b0b14',
+		dim: '185,247,255',
+	},
+	'ACID / TOXIC GREEN': {
+		cyan: '#39ff9e',
+		mag: '#c6ff2e',
+		text: '#daffe4',
+		cyanGlow: '57,255,158',
+		magGlow: '198,255,46',
+		bg: '#07070c',
+		panel: '#0b0b14',
+		dim: '185,247,255',
+	},
+	'AMBER / CRT ORANGE': {
+		cyan: '#ffb728',
+		mag: '#ff5e2e',
+		text: '#ffe9c7',
+		cyanGlow: '255,183,40',
+		magGlow: '255,94,46',
+		bg: '#07070c',
+		panel: '#0b0b14',
+		dim: '185,247,255',
+	},
+	'ICE / ARCTIC BLUE': {
+		cyan: '#7fd4ff',
+		mag: '#4f7bff',
+		text: '#dcefff',
+		cyanGlow: '127,212,255',
+		magGlow: '79,123,255',
+		bg: '#07070c',
+		panel: '#0b0b14',
+		dim: '185,247,255',
+	},
+	'BLOOD / INFRARED': {
+		cyan: '#ff2e55',
+		mag: '#ff8c2e',
+		text: '#ffd7d7',
+		cyanGlow: '255,46,85',
+		magGlow: '255,140,46',
+		bg: '#07070c',
+		panel: '#0b0b14',
+		dim: '185,247,255',
+	},
+	'VAPOR / SUNSET': {
+		cyan: '#ff6ad5',
+		mag: '#c774f0',
+		text: '#ffe0f5',
+		cyanGlow: '255,106,213',
+		magGlow: '199,116,240',
+		bg: '#07070c',
+		panel: '#0b0b14',
+		dim: '185,247,255',
+	},
+	'PAPER / DAYLIGHT': {
+		cyan: '#0e8fa8',
+		mag: '#c21f7b',
+		text: '#14171f',
+		cyanGlow: '14,143,168',
+		magGlow: '194,31,123',
+		bg: '#e7ebf0',
+		panel: '#f8fafc',
+		dim: '92,104,124',
+	},
+};
+
+export function cssVars(c: SchemeColors): CSSProperties {
+	return {
+		['--cy' as string]: c.cyan,
+		['--mg' as string]: c.mag,
+		['--tx' as string]: c.text,
+		['--cyg' as string]: c.cyanGlow,
+		['--mgg' as string]: c.magGlow,
+		['--bg' as string]: c.bg,
+		['--panel' as string]: c.panel,
+		['--dim' as string]: c.dim,
+		background: c.bg,
+		color: c.text,
+	};
+}
