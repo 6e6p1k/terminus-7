@@ -9,7 +9,7 @@
 {#snippet sidebarContent()}
 	<div class="flex flex-col flex-1 w-full h-full">
 		<!-- Header -->
-		<div class="relative" style="padding: 18px 16px 14px; border-bottom: 1px solid rgba({store.colors.cyanGlow},0.28);">
+		<div class="relative" style="padding: calc(18px + env(safe-area-inset-top, 0px)) 16px 14px; border-bottom: 1px solid rgba({store.colors.cyanGlow},0.28);">
 			<div
 				class="leading-[0.9] tracking-[1px]"
 				style="font-family: 'VT323', monospace; font-size: 30px; color: {store.colors.cyan}; text-shadow: 0 0 10px rgba({store.colors.cyanGlow},0.55);"

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#07070c"/>
+  <rect x="2" y="2" width="28" height="28" fill="none" stroke="#22e6ff" stroke-width="1.5"/>
+  <path d="M2 8 V2 H8" fill="none" stroke="#ff37c7" stroke-width="2"/>
+  <path d="M24 2 H30 V8" fill="none" stroke="#ff37c7" stroke-width="2"/>
+  <path d="M2 24 V30 H8" fill="none" stroke="#ff37c7" stroke-width="2"/>
+  <path d="M24 30 H30 V24" fill="none" stroke="#ff37c7" stroke-width="2"/>
+  <text x="16" y="18" text-anchor="middle" dominant-baseline="central"
+    font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700"
+    font-size="12" fill="#22e6ff">T7</text>
+</svg>

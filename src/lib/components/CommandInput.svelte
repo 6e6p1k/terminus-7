@@ -24,7 +24,12 @@
 	}
 </script>
 
-<div class="flex-shrink-0 relative z-20" style="padding: {store.isMobile ? '64px 12px 8px' : '20px 24px 10px'};">
+<div
+	class="flex-shrink-0 relative z-20"
+	style="padding: {store.isMobile
+		? `calc(64px + env(safe-area-inset-top, 0px)) 12px 8px 12px`
+		: '20px 24px 10px'};"
+>
 	<div
 		class="relative"
 		style="background: #0b0b14; border: 2px solid {store.colors.cyan}; box-shadow: 0 0 0 2px #07070c, 8px 8px 0 rgba({store.colors.magGlow},0.55), 0 0 26px rgba({store.colors.cyanGlow},0.35); clip-path: polygon(0 0,100% 0,100% 78%,97% 100%,3% 100%,0 82%);"

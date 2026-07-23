@@ -4,6 +4,7 @@
 	import ChatFeed from '$lib/components/ChatFeed.svelte';
 	import CommandInput from '$lib/components/CommandInput.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+	import InstallTip from '$lib/components/InstallTip.svelte';
 	import { onMount } from 'svelte';
 
 	let feedEl: HTMLDivElement;
@@ -43,8 +44,8 @@
 </script>
 
 <div
-	class="relative h-screen w-full overflow-hidden flex"
-	style="background: #07070c; color: {store.colors.text}; font-family: 'Share Tech Mono', monospace;"
+	class="relative h-dvh w-full overflow-hidden flex"
+	style="background: #07070c; color: {store.colors.text}; font-family: 'Share Tech Mono', monospace; padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);"
 >
 	<!-- Scanlines -->
 	{#if store.scanlines}
@@ -67,8 +68,8 @@
 	{#if store.isMobile}
 		<button
 			onclick={() => (store.sidebarOpen = !store.sidebarOpen)}
-			class="absolute top-3 left-3 z-60 cursor-pointer w-11 h-11 border-0 text-[26px] leading-[44px] transition-all duration-[80ms]"
-			style="background: {store.colors.cyan}; color: #07070c; font-family: 'VT323', monospace; box-shadow: 4px 4px 0 {store.colors.mag};"
+			class="absolute z-60 cursor-pointer w-11 h-11 border-0 text-[26px] leading-[44px] transition-all duration-[80ms]"
+			style="top: calc(0.75rem + env(safe-area-inset-top, 0px)); left: calc(0.75rem + env(safe-area-inset-left, 0px)); background: {store.colors.cyan}; color: #07070c; font-family: 'VT323', monospace; box-shadow: 4px 4px 0 {store.colors.mag};"
 			onmousedown={(e) => { e.currentTarget.style.transform = 'translate(3px,3px)'; e.currentTarget.style.boxShadow = `1px 1px 0 ${store.colors.mag}`; }}
 			onmouseup={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.mag}`; }}
 		>
@@ -79,10 +80,11 @@
 	<!-- Main area -->
 	<main class="flex-1 min-w-0 relative flex flex-col overflow-hidden">
 		<CommandInput />
-		<div bind:this={feedEl} class="flex-1 overflow-y-auto">
+		<div bind:this={feedEl} class="flex-1 overflow-y-auto" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
 			<ChatFeed />
 		</div>
 	</main>
 
 	<SettingsPanel />
+	<InstallTip />
 </div>
