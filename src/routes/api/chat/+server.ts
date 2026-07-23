@@ -84,7 +84,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		},
 	});
 
-	return result.toDataStreamResponse({
+	// AI SDK v6+ removed toDataStreamResponse — plain text stream matches our custom client
+	return result.toTextStreamResponse({
 		headers: { 'X-Chat-Id': activeChatId },
 	});
 };

@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { store, SCHEME_MAP } from '$lib/stores/chat.svelte';
-	import { COLOR_SCHEMES, type ColorScheme } from '$lib/types';
-
-	const { colors } = store;
+	import { COLOR_SCHEMES } from '$lib/types';
 </script>
 
 {#if store.settingsOpen}
@@ -15,14 +13,14 @@
 
 	<div
 		class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90vw] max-w-[420px] animate-tm-boot"
-		style="background: #0b0b14; border: 2px solid {colors.cyan};
-			box-shadow: 0 0 0 2px #07070c, 12px 12px 0 rgba({colors.magGlow},0.5), 0 0 30px rgba({colors.cyanGlow},0.35);
+		style="background: #0b0b14; border: 2px solid {store.colors.cyan};
+			box-shadow: 0 0 0 2px #07070c, 12px 12px 0 rgba({store.colors.magGlow},0.5), 0 0 30px rgba({store.colors.cyanGlow},0.35);
 			clip-path: polygon(0 0,100% 0,100% 94%,95% 100%,0 100%);"
 	>
 		<!-- Header -->
 		<div
 			class="flex items-center justify-between px-4 py-3 text-lg tracking-[2px]"
-			style="font-family: 'VT323', monospace; color: #07070c; background: {colors.cyan};"
+			style="font-family: 'VT323', monospace; color: #07070c; background: {store.colors.cyan};"
 		>
 			◤ SYSTEM_CONFIG
 			<button
@@ -39,7 +37,7 @@
 			<div>
 				<div
 					class="text-xs tracking-[3px] mb-2.5"
-					style="font-family: 'Share Tech Mono', monospace; color: rgba({colors.magGlow},0.7);"
+					style="font-family: 'Share Tech Mono', monospace; color: rgba({store.colors.magGlow},0.7);"
 				>
 					◤ PALETTE
 				</div>
@@ -73,9 +71,9 @@
 					onclick={() => (store.scanlines = !store.scanlines)}
 					class="flex-1 cursor-pointer text-center py-2 px-3 text-xs tracking-[1px] border transition-colors duration-75"
 					style="font-family: 'Share Tech Mono', monospace;
-						background: {store.scanlines ? `rgba(${colors.cyanGlow},0.12)` : 'transparent'};
-						border-color: {store.scanlines ? colors.cyan : `rgba(${colors.cyanGlow},0.25)`};
-						color: {store.scanlines ? colors.cyan : 'rgba(185,247,255,0.45)'};"
+						background: {store.scanlines ? `rgba(${store.colors.cyanGlow},0.12)` : 'transparent'};
+						border-color: {store.scanlines ? store.colors.cyan : `rgba(${store.colors.cyanGlow},0.25)`};
+						color: {store.scanlines ? store.colors.cyan : 'rgba(185,247,255,0.45)'};"
 				>
 					{store.scanlines ? '◆' : '◇'} SCANLINES
 				</button>
@@ -83,9 +81,9 @@
 					onclick={() => (store.stagger = !store.stagger)}
 					class="flex-1 cursor-pointer text-center py-2 px-3 text-xs tracking-[1px] border transition-colors duration-75"
 					style="font-family: 'Share Tech Mono', monospace;
-						background: {store.stagger ? `rgba(${colors.magGlow},0.12)` : 'transparent'};
-						border-color: {store.stagger ? colors.mag : `rgba(${colors.magGlow},0.25)`};
-						color: {store.stagger ? colors.mag : 'rgba(185,247,255,0.45)'};"
+						background: {store.stagger ? `rgba(${store.colors.magGlow},0.12)` : 'transparent'};
+						border-color: {store.stagger ? store.colors.mag : `rgba(${store.colors.magGlow},0.25)`};
+						color: {store.stagger ? store.colors.mag : 'rgba(185,247,255,0.45)'};"
 				>
 					{store.stagger ? '◆' : '◇'} STAGGER
 				</button>
@@ -94,7 +92,7 @@
 			<!-- API Key hint -->
 			<div
 				class="text-[10px] tracking-[1px] p-3 border border-dashed"
-				style="color: rgba(185,247,255,0.5); border-color: rgba({colors.cyanGlow},0.25); font-family: 'Share Tech Mono', monospace;"
+				style="color: rgba(185,247,255,0.5); border-color: rgba({store.colors.cyanGlow},0.25); font-family: 'Share Tech Mono', monospace;"
 			>
 				AI_GATEWAY_API_KEY is configured via environment variables on the server. Set it in your Vercel project settings.
 			</div>

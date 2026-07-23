@@ -6,8 +6,6 @@
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import { onMount } from 'svelte';
 
-	const { colors, scanlines, isMobile, sidebarOpen } = store;
-
 	let feedEl: HTMLDivElement;
 
 	onMount(() => {
@@ -16,7 +14,7 @@
 		// handle resize
 		function onResize() {
 			const m = window.innerWidth < 900;
-			if (m !== isMobile) {
+			if (m !== store.isMobile) {
 				store.isMobile = m;
 				store.sidebarOpen = false;
 			}
@@ -46,15 +44,15 @@
 
 <div
 	class="relative h-screen w-full overflow-hidden flex"
-	style="background: #07070c; color: {colors.text}; font-family: 'Share Tech Mono', monospace;"
+	style="background: #07070c; color: {store.colors.text}; font-family: 'Share Tech Mono', monospace;"
 >
 	<!-- Scanlines -->
-	{#if scanlines}
+	{#if store.scanlines}
 		<div class="fixed inset-0 pointer-events-none z-[900] mix-blend-multiply"
 			style="background: repeating-linear-gradient(180deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px);"
 		></div>
 		<div class="fixed left-0 right-0 top-0 h-[60px] pointer-events-none z-[902] animate-tm-scan"
-			style="background: linear-gradient(180deg, rgba({colors.cyanGlow},0.10), rgba({colors.cyanGlow},0));"
+			style="background: linear-gradient(180deg, rgba({store.colors.cyanGlow},0.10), rgba({store.colors.cyanGlow},0));"
 		></div>
 	{/if}
 
@@ -66,13 +64,13 @@
 	<Sidebar />
 
 	<!-- Mobile toggle -->
-	{#if isMobile}
+	{#if store.isMobile}
 		<button
 			onclick={() => (store.sidebarOpen = !store.sidebarOpen)}
 			class="absolute top-3 left-3 z-60 cursor-pointer w-11 h-11 border-0 text-[26px] leading-[44px] transition-all duration-[80ms]"
-			style="background: {colors.cyan}; color: #07070c; font-family: 'VT323', monospace; box-shadow: 4px 4px 0 {colors.mag};"
-			onmousedown={(e) => { e.currentTarget.style.transform = 'translate(3px,3px)'; e.currentTarget.style.boxShadow = `1px 1px 0 ${colors.mag}`; }}
-			onmouseup={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `4px 4px 0 ${colors.mag}`; }}
+			style="background: {store.colors.cyan}; color: #07070c; font-family: 'VT323', monospace; box-shadow: 4px 4px 0 {store.colors.mag};"
+			onmousedown={(e) => { e.currentTarget.style.transform = 'translate(3px,3px)'; e.currentTarget.style.boxShadow = `1px 1px 0 ${store.colors.mag}`; }}
+			onmouseup={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.mag}`; }}
 		>
 			≣
 		</button>

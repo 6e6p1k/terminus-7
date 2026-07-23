@@ -108,14 +108,24 @@ class ChatStore {
 			}
 
 			if (!res.ok || !res.body) {
+				const errText = await res.text().catch(() => '');
+				this.messages = [
+					...this.messages,
+					{
+						id: crypto.randomUUID(),
+						chatId: this.activeChatId ?? newChatId ?? '',
+						role: 'assistant',
+						content: `SYS_ERR :: uplink failed (${res.status}). ${errText.slice(0, 200) || 'Check DATABASE_URL and AI_GATEWAY_API_KEY.'}`,
+						createdAt: new Date(),
+					},
+				];
 				this.generating = false;
 				return;
 			}
 
-			// stream the response
+			// stream plain text from toTextStreamResponse
 			const reader = res.body.getReader();
 			const decoder = new TextDecoder();
-			let buffer = '';
 			let assistantContent = '';
 
 			// add placeholder assistant message
@@ -132,25 +142,10 @@ class ChatStore {
 			while (true) {
 				const { done, value } = await reader.read();
 				if (done) break;
-				buffer += decoder.decode(value, { stream: true });
-
-				// parse SSE stream for AI SDK data stream protocol
-				const lines = buffer.split('\n');
-				buffer = lines.pop() ?? '';
-
-				for (const line of lines) {
-					if (line.startsWith('0:')) {
-						const text = line.slice(2).trim();
-						if (text.startsWith('"') && text.endsWith('"')) {
-							assistantContent += JSON.parse(text);
-						} else {
-							assistantContent += text;
-						}
-						this.messages = this.messages.map((m) =>
-							m.id === assistantId ? { ...m, content: assistantContent } : m
-						);
-					}
-				}
+				assistantContent += decoder.decode(value, { stream: true });
+				this.messages = this.messages.map((m) =>
+					m.id === assistantId ? { ...m, content: assistantContent } : m
+				);
 			}
 		} catch (err) {
 			if ((err as Error).name !== 'AbortError') {
