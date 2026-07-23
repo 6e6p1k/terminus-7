@@ -94,7 +94,7 @@
 				class="text-[10px] tracking-[1px] p-3 border border-dashed"
 				style="color: rgba(185,247,255,0.5); border-color: rgba({store.colors.cyanGlow},0.25); font-family: 'Share Tech Mono', monospace;"
 			>
-				AI_GATEWAY_API_KEY is configured via environment variables on the server. Set it in your Vercel project settings.
+				Models route through Vercel AI Gateway (provider/model slugs). Auth: AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN via `vercel env pull`. Also set DATABASE_URL for Neon.
 			</div>
 		</div>
 	</div>

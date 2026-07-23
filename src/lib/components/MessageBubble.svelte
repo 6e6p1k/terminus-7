@@ -54,24 +54,30 @@
 			{#if isAI}
 				<div class="flex gap-1.5 mt-2">
 					<button
-						onclick={() => store.copyText(msg.content)}
-						class="cursor-pointer text-[10px] py-1 px-1.5 tracking-[1px]"
-						style="background: #07070c; color: {store.colors.cyan}; border: 1px solid rgba({store.colors.cyanGlow},0.5); font-family: 'Share Tech Mono', monospace;"
-						onmouseenter={(e) => { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.color = '#07070c'; }}
-						onmouseleave={(e) => { e.currentTarget.style.background = '#07070c'; e.currentTarget.style.color = store.colors.cyan; }}
+						type="button"
+						onclick={() => store.copyText(msg.content, msg.id)}
+						disabled={!msg.content}
+						class="cursor-pointer text-[10px] py-1 px-1.5 tracking-[1px] disabled:opacity-40"
+						style="background: {store.copiedId === msg.id ? store.colors.cyan : '#07070c'}; color: {store.copiedId === msg.id ? '#07070c' : store.colors.cyan}; border: 1px solid rgba({store.colors.cyanGlow},0.5); font-family: 'Share Tech Mono', monospace;"
+						onmouseenter={(e) => { if (store.copiedId !== msg.id) { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.color = '#07070c'; } }}
+						onmouseleave={(e) => { if (store.copiedId !== msg.id) { e.currentTarget.style.background = '#07070c'; e.currentTarget.style.color = store.colors.cyan; } }}
 					>
-						▤ CPY
+						{store.copiedId === msg.id ? '▤ OK' : '▤ CPY'}
 					</button>
 					<button
-						onclick={() => store.send()}
-						class="cursor-pointer text-[10px] py-1 px-1.5 tracking-[1px]"
+						type="button"
+						onclick={() => store.regenerate(msg.id)}
+						disabled={store.generating || !msg.content}
+						title="Regenerate this reply"
+						class="cursor-pointer text-[10px] py-1 px-1.5 tracking-[1px] disabled:opacity-40 disabled:cursor-not-allowed"
 						style="background: #07070c; color: {store.colors.cyan}; border: 1px solid rgba({store.colors.cyanGlow},0.5); font-family: 'Share Tech Mono', monospace;"
-						onmouseenter={(e) => { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.color = '#07070c'; }}
+						onmouseenter={(e) => { if (!store.generating) { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.color = '#07070c'; } }}
 						onmouseleave={(e) => { e.currentTarget.style.background = '#07070c'; e.currentTarget.style.color = store.colors.cyan; }}
 					>
 						↻ RGN
 					</button>
 					<button
+						type="button"
 						onclick={() => store.toggleFeedback(msg.id)}
 						class="cursor-pointer text-[10px] py-1 px-1.5 tracking-[1px]"
 						style="background: {store.feedback[msg.id] ? store.colors.mag : '#07070c'}; color: {store.feedback[msg.id] ? '#07070c' : store.colors.mag}; border: 1px solid {store.colors.mag}; font-family: 'Share Tech Mono', monospace;"

@@ -1,4 +1,5 @@
 import type { Chat, Message, ModelName, ColorScheme, SchemeColors } from '$lib/types';
+import { MODEL_CATALOG } from '$lib/types';
 
 // ── color scheme definitions ──
 export const SCHEME_MAP: Record<ColorScheme, SchemeColors> = {
@@ -20,6 +21,7 @@ class ChatStore {
 	generating = $state(false);
 	currentModel = $state<ModelName>('TERMINUS-CORE-4');
 	modelOpen = $state(false);
+	attachHint = $state('');
 
 	// UI state
 	scheme = $state<ColorScheme>('CYAN / MAGENTA');
@@ -34,6 +36,7 @@ class ChatStore {
 
 	// feedback toggles
 	feedback = $state<Record<string, boolean>>({});
+	copiedId = $state<string | null>(null);
 
 	// abort controller for stopping generation
 	abortController: AbortController | null = null;
@@ -47,12 +50,17 @@ class ChatStore {
 		return this.chats.find((c) => c.id === this.activeChatId);
 	}
 
+	get currentModelMeta() {
+		return MODEL_CATALOG[this.currentModel];
+	}
+
 	// ── actions ──
 
 	async loadChats() {
 		const res = await fetch('/api/chat');
 		if (res.ok) {
-			this.chats = await res.json();
+			const data = await res.json();
+			if (Array.isArray(data)) this.chats = data;
 		}
 	}
 
@@ -70,24 +78,28 @@ class ChatStore {
 		this.messages = [];
 		this.input = '';
 		this.sidebarOpen = false;
+		this.attachHint = '';
 	}
 
-	async send() {
-		const text = this.input.trim();
+	async send(opts?: { text?: string; regenerate?: boolean }) {
+		const text = (opts?.text ?? this.input).trim();
+		const regenerate = opts?.regenerate === true;
 		if (!text || this.generating) return;
 
-		const userMsg: Message = {
-			id: crypto.randomUUID(),
-			chatId: this.activeChatId ?? 'pending',
-			role: 'user',
-			content: text,
-			createdAt: new Date(),
-		};
+		if (!regenerate) {
+			const userMsg: Message = {
+				id: crypto.randomUUID(),
+				chatId: this.activeChatId ?? 'pending',
+				role: 'user',
+				content: text,
+				createdAt: new Date(),
+			};
+			this.messages = [...this.messages, userMsg];
+			this.input = '';
+			this.attachHint = '';
+		}
 
-		this.messages = [...this.messages, userMsg];
-		this.input = '';
 		this.generating = true;
-
 		this.abortController = new AbortController();
 
 		try {
@@ -98,6 +110,7 @@ class ChatStore {
 					chatId: this.activeChatId,
 					message: text,
 					model: this.currentModel,
+					regenerate,
 				}),
 				signal: this.abortController.signal,
 			});
@@ -115,29 +128,28 @@ class ChatStore {
 						id: crypto.randomUUID(),
 						chatId: this.activeChatId ?? newChatId ?? '',
 						role: 'assistant',
-						content: `SYS_ERR :: uplink failed (${res.status}). ${errText.slice(0, 200) || 'Check DATABASE_URL and AI_GATEWAY_API_KEY.'}`,
+						content: `SYS_ERR :: uplink failed (${res.status}). ${errText.slice(0, 240) || 'Check DATABASE_URL and AI Gateway auth (AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN).'}`,
 						createdAt: new Date(),
 					},
 				];
-				this.generating = false;
 				return;
 			}
 
-			// stream plain text from toTextStreamResponse
 			const reader = res.body.getReader();
 			const decoder = new TextDecoder();
 			let assistantContent = '';
 
-			// add placeholder assistant message
 			const assistantId = crypto.randomUUID();
-			const assistantMsg: Message = {
-				id: assistantId,
-				chatId: this.activeChatId ?? newChatId ?? '',
-				role: 'assistant',
-				content: '',
-				createdAt: new Date(),
-			};
-			this.messages = [...this.messages, assistantMsg];
+			this.messages = [
+				...this.messages,
+				{
+					id: assistantId,
+					chatId: this.activeChatId ?? newChatId ?? '',
+					role: 'assistant',
+					content: '',
+					createdAt: new Date(),
+				},
+			];
 
 			while (true) {
 				const { done, value } = await reader.read();
@@ -150,12 +162,59 @@ class ChatStore {
 		} catch (err) {
 			if ((err as Error).name !== 'AbortError') {
 				console.error('Chat error:', err);
+				this.messages = [
+					...this.messages,
+					{
+						id: crypto.randomUUID(),
+						chatId: this.activeChatId ?? '',
+						role: 'assistant',
+						content: `SYS_ERR :: ${err instanceof Error ? err.message : 'unknown uplink fault'}`,
+						createdAt: new Date(),
+					},
+				];
 			}
 		} finally {
 			this.generating = false;
 			this.abortController = null;
 			await this.loadChats();
 		}
+	}
+
+	async regenerate(assistantMsgId: string) {
+		if (this.generating) return;
+		const idx = this.messages.findIndex((m) => m.id === assistantMsgId);
+		if (idx < 0) return;
+
+		let userIdx = idx - 1;
+		while (userIdx >= 0 && this.messages[userIdx].role !== 'user') userIdx--;
+		if (userIdx < 0) return;
+
+		const userText = this.messages[userIdx].content;
+		this.messages = this.messages.slice(0, idx);
+		await this.send({ text: userText, regenerate: true });
+	}
+
+	async attachFiles(files: FileList | File[]) {
+		const list = Array.from(files);
+		if (!list.length) return;
+
+		const chunks: string[] = [];
+		for (const file of list) {
+			if (file.size > 200_000) {
+				chunks.push(`[ATTACH_SKIPPED :: ${file.name} — file too large (>200KB)]`);
+				continue;
+			}
+			if (!file.type.startsWith('text/') && !/\.(txt|md|json|csv|ts|js|svelte|py|rs|go|toml|yml|yaml|log)$/i.test(file.name)) {
+				chunks.push(`[ATTACH_META :: ${file.name} (${file.type || 'unknown'}, ${file.size}B) — binary attach not streamed; describe it in your prompt.]`);
+				continue;
+			}
+			const text = await file.text();
+			chunks.push(`--- ATTACH:${file.name} ---\n${text}\n--- /ATTACH ---`);
+		}
+
+		const block = chunks.join('\n\n');
+		this.input = this.input ? `${this.input.trimEnd()}\n\n${block}` : block;
+		this.attachHint = `${list.length} file(s) staged in buffer`;
 	}
 
 	stop() {
@@ -167,9 +226,15 @@ class ChatStore {
 		this.feedback = { ...this.feedback, [msgId]: !this.feedback[msgId] };
 	}
 
-	async copyText(text: string) {
+	async copyText(text: string, msgId?: string) {
 		try {
 			await navigator.clipboard.writeText(text);
+			if (msgId) {
+				this.copiedId = msgId;
+				setTimeout(() => {
+					if (this.copiedId === msgId) this.copiedId = null;
+				}, 1200);
+			}
 		} catch {
 			// fallback
 		}

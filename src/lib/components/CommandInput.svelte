@@ -2,10 +2,24 @@
 	import { store } from '$lib/stores/chat.svelte';
 	import ModelPicker from './ModelPicker.svelte';
 
+	let fileInput: HTMLInputElement;
+
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			store.send();
+		}
+	}
+
+	function onAttachClick() {
+		fileInput?.click();
+	}
+
+	async function onFilesSelected(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		if (input.files?.length) {
+			await store.attachFiles(input.files);
+			input.value = '';
 		}
 	}
 </script>
@@ -54,36 +68,49 @@
 					onfocus={(e) => { e.currentTarget.style.borderColor = store.colors.mag; e.currentTarget.style.boxShadow = `inset 0 0 12px rgba(${store.colors.magGlow},0.2)`; }}
 					onblur={(e) => { e.currentTarget.style.borderColor = `rgba(${store.colors.cyanGlow},0.4)`; e.currentTarget.style.boxShadow = ''; }}
 				></textarea>
+				{#if store.attachHint}
+					<div class="mt-1 text-[9px] tracking-[1px]" style="color: rgba({store.colors.magGlow},0.8); font-family: 'Share Tech Mono', monospace;">
+						◈ {store.attachHint}
+					</div>
+				{/if}
 			</div>
 
 			<div class="flex flex-col gap-1.5 flex-shrink-0">
 				<button
+					type="button"
 					onclick={() => store.send()}
 					disabled={store.generating || !store.input.trim()}
-					class="cursor-pointer border-0 py-2.5 px-4.5 transition-all duration-[80ms] tracking-[2px]"
+					class="cursor-pointer border-0 py-2.5 px-4.5 transition-all duration-[80ms] tracking-[2px] disabled:cursor-not-allowed"
 					style="font-family: 'VT323', monospace; font-size: 24px; color: #07070c; background: {store.colors.cyan}; box-shadow: 4px 4px 0 {store.colors.mag}; opacity: {store.generating || !store.input.trim() ? 0.5 : 1};"
-					onmouseenter={(e) => { if (!store.generating) { e.currentTarget.style.background = store.colors.mag; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.cyan}`; } }}
-					onmouseleave={(e) => { if (!store.generating) { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.mag}`; } }}
-					onmousedown={(e) => { if (!store.generating) { e.currentTarget.style.transform = 'translate(3px,3px)'; e.currentTarget.style.boxShadow = `1px 1px 0 ${store.colors.mag}`; } }}
-					onmouseup={(e) => { if (!store.generating) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.mag}`; } }}
+					onmouseenter={(e) => { if (!store.generating && store.input.trim()) { e.currentTarget.style.background = store.colors.mag; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.cyan}`; } }}
+					onmouseleave={(e) => { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.mag}`; }}
+					onmousedown={(e) => { if (!store.generating && store.input.trim()) { e.currentTarget.style.transform = 'translate(3px,3px)'; e.currentTarget.style.boxShadow = `1px 1px 0 ${store.colors.mag}`; } }}
+					onmouseup={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `4px 4px 0 ${store.colors.mag}`; }}
 				>
 					SEND ▶
 				</button>
 				<div class="flex gap-1.5">
 					<button
-						class="flex-1 cursor-pointer text-[11px] py-1.5 px-2 tracking-[1px]"
+						type="button"
+						onclick={onAttachClick}
+						disabled={store.generating}
+						title="Attach text files into the prompt buffer"
+						class="flex-1 cursor-pointer text-[11px] py-1.5 px-2 tracking-[1px] disabled:opacity-40 disabled:cursor-not-allowed"
 						style="background: #0b0b14; color: {store.colors.cyan}; border: 1px solid {store.colors.cyan}; font-family: 'Share Tech Mono', monospace;"
-						onmouseenter={(e) => { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.color = '#07070c'; }}
+						onmouseenter={(e) => { if (!store.generating) { e.currentTarget.style.background = store.colors.cyan; e.currentTarget.style.color = '#07070c'; } }}
 						onmouseleave={(e) => { e.currentTarget.style.background = '#0b0b14'; e.currentTarget.style.color = store.colors.cyan; }}
 					>
 						⚟ ATT
 					</button>
 					<button
+						type="button"
 						onclick={() => store.stop()}
-						class="flex-1 cursor-pointer text-[11px] py-1.5 px-2 tracking-[1px]"
+						disabled={!store.generating}
+						title="Abort generation"
+						class="flex-1 cursor-pointer text-[11px] py-1.5 px-2 tracking-[1px] disabled:cursor-not-allowed"
 						style="background: #0b0b14; color: {store.generating ? store.colors.mag : 'rgba(185,247,255,0.4)'}; border: 1px solid {store.generating ? store.colors.mag : 'rgba(185,247,255,0.3)'}; font-family: 'Share Tech Mono', monospace; animation: {store.generating ? 'tm-pulse 1s steps(2) infinite' : 'none'};"
 						onmouseenter={(e) => { if (store.generating) { e.currentTarget.style.background = store.colors.mag; e.currentTarget.style.color = '#07070c'; } }}
-						onmouseleave={(e) => { if (store.generating) { e.currentTarget.style.background = '#0b0b14'; e.currentTarget.style.color = store.generating ? store.colors.mag : 'rgba(185,247,255,0.4)'; } }}
+						onmouseleave={(e) => { if (store.generating) { e.currentTarget.style.background = '#0b0b14'; e.currentTarget.style.color = store.colors.mag; } }}
 					>
 						◼ STOP
 					</button>
@@ -94,13 +121,16 @@
 		<!-- Bottom bar -->
 		<div class="flex items-center justify-between gap-2.5 px-2.5 py-2 border-t border-dashed" style="border-color: rgba({store.colors.cyanGlow},0.2);">
 			<button
+				type="button"
 				onclick={() => (store.modelOpen = !store.modelOpen)}
-				class="cursor-pointer bg-transparent text-[10px] tracking-[1px] py-[3px] px-2 whitespace-nowrap transition-all duration-100"
+				class="cursor-pointer bg-transparent text-[10px] tracking-[1px] py-[3px] px-2 whitespace-nowrap transition-all duration-100 max-w-[70%] overflow-hidden text-ellipsis"
 				style="border: 1px dashed rgba({store.colors.cyanGlow},{store.modelOpen ? '0.7' : '0.35'}); font-family: 'Share Tech Mono', monospace; color: {store.modelOpen ? store.colors.cyan : 'rgba(185,247,255,0.6)'};"
 				onmouseenter={(e) => { e.currentTarget.style.color = store.colors.cyan; e.currentTarget.style.borderColor = store.colors.cyan; }}
 				onmouseleave={(e) => { e.currentTarget.style.color = store.modelOpen ? store.colors.cyan : 'rgba(185,247,255,0.6)'; e.currentTarget.style.borderColor = `rgba(${store.colors.cyanGlow},${store.modelOpen ? '0.7' : '0.35'})`; }}
 			>
-				◆ {store.currentModel} ▾
+				◆ {store.currentModel}
+				<span style="color: {store.colors.mag};">/{store.currentModelMeta.label}</span>
+				▾
 			</button>
 			<span
 				class="text-[9px] tracking-[2px] whitespace-nowrap overflow-hidden text-ellipsis"
@@ -110,6 +140,15 @@
 			</span>
 		</div>
 	</div>
+
+	<input
+		bind:this={fileInput}
+		type="file"
+		class="hidden"
+		multiple
+		accept=".txt,.md,.json,.csv,.ts,.js,.svelte,.py,.rs,.go,.toml,.yml,.yaml,.log,text/*"
+		onchange={onFilesSelected}
+	/>
 
 	<!-- Model picker dropdown -->
 	{#if store.modelOpen}
