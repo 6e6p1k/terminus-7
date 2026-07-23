@@ -1,7 +1,15 @@
 <script lang="ts">
-	import '$lib/assets/favicon.svg';
 	import './layout.css';
+	import { afterNavigate } from '$app/navigation';
+
 	let { children } = $props();
+
+	afterNavigate(async () => {
+		if ('serviceWorker' in navigator) {
+			const registration = await navigator.serviceWorker.getRegistration();
+			await registration?.update();
+		}
+	});
 </script>
 
 <svelte:head>
