@@ -36,7 +36,12 @@ export function SettingsPanel() {
 					left: '50%',
 					transform: 'translate(-50%, -50%)',
 					zIndex: 101,
-					width: 'min(420px, 92vw)',
+					width: 'min(420px, calc(92vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)))',
+					maxHeight:
+						'min(90dvh, calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px))',
+					display: 'flex',
+					flexDirection: 'column',
+					overflow: 'hidden',
 					background: C.panel,
 					border: `2px solid ${C.cyan}`,
 					boxShadow: `0 0 0 2px ${C.bg}, 10px 10px 0 rgba(${C.magGlow},0.45)`,
@@ -55,11 +60,13 @@ export function SettingsPanel() {
 						fontFamily: 'var(--font-vt323), monospace',
 						fontSize: 20,
 						letterSpacing: 2,
+						flexShrink: 0,
 					}}
 				>
 					<span>◤ SYS_CONFIG</span>
 					<button
 						type="button"
+						title="CLOSE"
 						onClick={() => setSettingsOpen(false)}
 						style={{
 							background: 'none',
@@ -67,12 +74,27 @@ export function SettingsPanel() {
 							cursor: 'pointer',
 							fontSize: 22,
 							color: C.bg,
+							width: 44,
+							height: 44,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							flexShrink: 0,
 						}}
 					>
 						✕
 					</button>
 				</div>
-				<div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+				<div
+					style={{
+						padding: 16,
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 14,
+						overflowY: 'auto',
+						WebkitOverflowScrolling: 'touch',
+					}}
+				>
 					<div>
 						<div style={{ fontSize: 10, letterSpacing: 2, color: `rgba(${C.dim},0.6)`, marginBottom: 8 }}>
 							PALETTE

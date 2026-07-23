@@ -26,6 +26,13 @@ export const metadata: Metadata = {
 		title: 'TERMINUS·7',
 	},
 	manifest: '/manifest.webmanifest',
+	icons: {
+		apple: [{ url: '/apple-icon', sizes: '180x180', type: 'image/png' }],
+		icon: [
+			{ url: '/icon', sizes: '512x512', type: 'image/png' },
+			{ url: '/icon.svg', type: 'image/svg+xml' },
+		],
+	},
 };
 
 export const viewport: Viewport = {

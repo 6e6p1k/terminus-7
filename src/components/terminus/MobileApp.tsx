@@ -41,6 +41,12 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 		}
 	};
 
+	// Framed preview fakes device chrome; real iOS PWA needs env(safe-area-inset-*).
+	const topInset = framed ? 52 : 'env(safe-area-inset-top, 0px)';
+	const bottomInset = framed ? 26 : 'max(12px, env(safe-area-inset-bottom, 0px))';
+	const leftInset = framed ? 0 : 'env(safe-area-inset-left, 0px)';
+	const rightInset = framed ? 0 : 'env(safe-area-inset-right, 0px)';
+
 	const shellStyle: CSSProperties = {
 		...cssVars(C),
 		position: 'relative',
@@ -50,7 +56,9 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 		fontFamily: "'Share Tech Mono', monospace",
 		display: 'flex',
 		flexDirection: 'column',
-		paddingTop: framed ? 52 : 0,
+		paddingTop: topInset,
+		paddingLeft: leftInset,
+		paddingRight: rightInset,
 	};
 
 	return (
@@ -187,7 +195,10 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 					background: C.panel,
 					borderTop: `2px solid ${C.cyan}`,
 					boxShadow: '0 -6px 20px rgba(0,0,0,0.5)',
-					padding: framed ? '8px 12px 26px' : '8px 12px max(12px, env(safe-area-inset-bottom))',
+					paddingTop: 8,
+					paddingLeft: 12,
+					paddingRight: 12,
+					paddingBottom: bottomInset,
 					position: 'relative',
 					zIndex: 6,
 				}}
@@ -212,7 +223,9 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 							fontFamily: "'Share Tech Mono', monospace",
 							fontSize: 11,
 							letterSpacing: 1,
-							padding: '5px 9px',
+							padding: '12px 12px',
+							minHeight: 44,
+							boxSizing: 'border-box',
 							whiteSpace: 'nowrap',
 							flex: '0 1 auto',
 							overflow: 'hidden',
@@ -232,7 +245,9 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 							border: `1px solid rgba(${C.cyanGlow},0.5)`,
 							fontFamily: "'Share Tech Mono', monospace",
 							fontSize: 11,
-							padding: '5px 9px',
+							padding: '12px 12px',
+							minHeight: 44,
+							boxSizing: 'border-box',
 							letterSpacing: 1,
 						}}
 					>
@@ -338,7 +353,9 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 							right: 0,
 							bottom: 0,
 							zIndex: 31,
-							paddingBottom: 26,
+							paddingBottom: bottomInset,
+							paddingLeft: leftInset,
+							paddingRight: rightInset,
 							background: C.panel,
 							borderTop: `2px solid ${C.cyan}`,
 							boxShadow: `0 0 0 2px ${C.bg}, 0 -10px 30px rgba(${C.cyanGlow},0.3)`,
@@ -397,7 +414,7 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 				</>
 			)}
 
-			{/* sessions slide-over */}
+			{/* sessions slide-over — absolute overlays ignore shell padding; inset explicitly */}
 			<div
 				style={{
 					position: 'absolute',
@@ -406,7 +423,9 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 					right: 0,
 					bottom: 0,
 					zIndex: 50,
-					paddingTop: framed ? 52 : 0,
+					paddingTop: topInset,
+					paddingLeft: leftInset,
+					paddingRight: rightInset,
 					background: C.panel,
 					display: 'flex',
 					flexDirection: 'column',
@@ -573,7 +592,10 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 					style={{
 						flexShrink: 0,
 						borderTop: `1px solid rgba(${C.cyanGlow},0.28)`,
-						padding: '14px 16px 28px',
+						paddingTop: 14,
+						paddingLeft: 16,
+						paddingRight: 16,
+						paddingBottom: bottomInset,
 						display: 'flex',
 						alignItems: 'center',
 						gap: 12,
@@ -616,6 +638,7 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 					</div>
 					<button
 						type="button"
+						title="SETTINGS"
 						onClick={() => setSettingsOpen(true)}
 						style={{
 							fontFamily: 'var(--font-vt323), monospace',
@@ -624,6 +647,12 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 							cursor: 'pointer',
 							background: 'none',
 							border: 'none',
+							width: 44,
+							height: 44,
+							flexShrink: 0,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
 						}}
 					>
 						⚙
