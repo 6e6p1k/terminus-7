@@ -56,7 +56,9 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 		fontFamily: "'Share Tech Mono', monospace",
 		display: 'flex',
 		flexDirection: 'column',
+		background: C.bg,
 		paddingTop: topInset,
+		paddingBottom: bottomInset,
 		paddingLeft: leftInset,
 		paddingRight: rightInset,
 	};
@@ -73,7 +75,7 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 					alignItems: 'center',
 					gap: 10,
 					padding: '8px 12px',
-					background: `linear-gradient(180deg,rgba(${C.cyanGlow},0.08),transparent)`,
+					background: C.panel,
 					borderBottom: `1px solid rgba(${C.cyanGlow},0.3)`,
 					position: 'relative',
 					zIndex: 6,
@@ -186,19 +188,17 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 				<span style={{ fontFamily: 'var(--font-vt323), monospace', fontSize: 14, color: C.cyan }}>{clock}</span>
 			</div>
 
-			<ChatFeed compact />
-
-			{/* input dock */}
+			{/* input dock — top placement matches desktop CommandInput */}
 			<div
 				style={{
 					flexShrink: 0,
 					background: C.panel,
-					borderTop: `2px solid ${C.cyan}`,
-					boxShadow: '0 -6px 20px rgba(0,0,0,0.5)',
+					borderBottom: `2px solid ${C.cyan}`,
+					boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
 					paddingTop: 8,
 					paddingLeft: 12,
 					paddingRight: 12,
-					paddingBottom: bottomInset,
+					paddingBottom: 8,
 					position: 'relative',
 					zIndex: 6,
 				}}
@@ -333,6 +333,8 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 					</button>
 				)}
 			</div>
+
+			<ChatFeed compact />
 
 			{/* model sheet */}
 			{modelOpen && (
@@ -599,7 +601,7 @@ export function MobileApp({ framed = false }: { framed?: boolean }) {
 						display: 'flex',
 						alignItems: 'center',
 						gap: 12,
-						background: `rgba(${C.cyanGlow},0.03)`,
+						background: C.panel,
 					}}
 				>
 					<div
